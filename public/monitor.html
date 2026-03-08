@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Flash Action Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Montserrat', sans-serif; }
+        
+        #game-ui { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; background: #000; z-index: 10; }
+        .question-wrapper { position: relative; height: 100%; display: inline-block; width: fit-content; }
+        #question-img { height: 100%; width: auto; display: block; }
+        
+        #timer-container { 
+            position: absolute; bottom: 1%; right: 5%; color: #333; 
+            font-size: 12vh; font-weight: 900; line-height: 1; 
+            font-variant-numeric: tabular-nums; 
+            transform: rotate(-7deg);
+        }
+        #score-display { display: none; position: absolute; top: 20px; left: 20px; color: white; font-size: 30px; background: rgba(0,0,0,0.5); padding: 10px; z-index: 100; }
+
+        #success-screen { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            display: none; justify-content: center; align-items: center; 
+            background-color: black; z-index: 9999; 
+        }
+        .success-wrapper { position: relative; display: block; height: 100%; width: auto; }
+        .success-wrapper img { height: 100%; width: auto; display: block; }
+
+        #final-score { 
+            position: absolute; top: 76%; left: 55%; 
+            font-size: 20vh; font-weight: 700; color: #000;
+            font-style: italic; 
+            line-height: 1; z-index: 20; font-variant-numeric: tabular-nums;
+        }
+
+        #perfect { 
+            position: absolute; top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            object-fit: contain; z-index: 50; 
+        }
+    </style>
+</head>
+<body>
+    <div id="game-ui">
+        <div id="score-display">SCORE: 0</div>
+        <div class="question-wrapper">
+            <img id="question-img" src="">
+            <div id="timer-container"><span id="timer">0</span></div>
+        </div>
+    </div>
+
+    <div id="success-screen">
+        <div class="success-wrapper">
+            <img id="success" src="images/success.png" alt="Success">
+            <div id="final-score">0</div>
+            <img id="perfect" src="images/perfect.png" alt="Perfect" style="display:none;">
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let timerId;
+
+        function startTimer(sec) {
+            clearInterval(timerId);
+            let timeLeft = sec;
+            document.getElementById('timer').innerText = timeLeft;
+            timerId = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
+                if (timeLeft <= 0) clearInterval(timerId);
+            }, 1000);
+        }
+
+        socket.on('init', (data) => {
+            if(data.isResultScreen) {
+                socket.emit('change_question', 0); // リザルト状態なら再描画
+            } else {
+                document.getElementById('success-screen').style.display = 'none';
+                updateUI(data, true);
+            }
+        });
+
+        socket.on('update_question', (data) => {
+            document.getElementById('success-screen').style.display = 'none';
+            updateUI(data, data.shouldRestartTimer);
+        });
+
+        function updateUI(data, shouldRestartTimer) {
+            if(!data || !data.question) return;
+
+            var imageurl = data.question.image;
+
+            if(data.question.id == '20'){ // q4-5 だけ日付によって謎変わる
+                var today = new Date();
+                if(today.getMonth()+1 == 3 && today.getDay() == 15){
+                    imageurl = 'q4-5_0316.png';
+                }
+                else if(today.getMonth()+1 == 3 && today.getDay() == 14){
+                    imageurl = 'q4-5_0315.png';
+                }
+                else{
+                    imageurl = 'q4-5_0315.png';
+                }
+            }
+
+            document.getElementById('question-img').src = 'images/' + imageurl;
+            document.getElementById('score-display').innerText = `SCORE: ${data.score}`;
+            if (shouldRestartTimer) startTimer(data.question.time);
+        }
+
+        socket.on('show_success', (data) => {
+            const successScreen = document.getElementById('success-screen');
+            const perfectImg = document.getElementById('perfect');
+            const successImg = document.getElementById('success');
+            const finalScore = document.getElementById('final-score');
+
+            successScreen.style.display = 'flex';
+            const total = Number(data.score);
+
+            if(total >= 31) {
+                perfectImg.style.display = 'block';
+                successImg.style.opacity = '0'; // 消すのではなく透明にする（サイズ維持のため）
+                finalScore.style.display = 'none';
+            } else {
+                perfectImg.style.display = 'none';
+                successImg.style.opacity = '1';
+                finalScore.innerText = total;
+                finalScore.style.display = 'block';
+            }
+            clearInterval(timerId);
+        });
+    </script>
+</body>
+</html>

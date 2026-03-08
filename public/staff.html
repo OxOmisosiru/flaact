@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Action Staff</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f4; padding: 20px; }
+        .btn { width: 100%; padding: 20px; font-size: 1.2rem; margin: 10px 0; border: none; border-radius: 10px; color: white; cursor: pointer; }
+        .correct { background: #ff4757; }
+        .correct:disabled { background: #ccc; cursor: not-allowed; }
+        .nav { background: #1e90ff; width: 48%; }
+        .undo { background: #7f8c8d; }
+        .ans-view { width: 100%; border: 2px solid #ccc; background: white; margin: 10px 0; padding: 20px; box-sizing: border-box; font-size: 1.4rem; font-weight: bold; }
+        #nowscore { color: #1e90ff; font-size: 2.5rem; font-weight: bold; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div id="q-id" style="font-size: 1.2rem; margin-bottom: 10px;">--</div>
+    <div class="ans-view"><span id="answer-text">確認中...</span></div>
+    
+    <button id="judge-btn" class="btn correct" onclick="socket.emit('judge', true)">◯ 正解判定 (+1点)</button>
+    
+    <div style="display: flex; justify-content: space-between;">
+        <button class="btn nav" onclick="socket.emit('change_question', -1)">◀ 前の問題</button>
+        <button class="btn nav" onclick="socket.emit('change_question', 1)">次の問題 ▶</button>
+    </div>
+
+    <div id="nowscore">0</div>
+    <div id="clear-status" style="color:red; font-size: 1.5rem; font-weight:bold; display:none;">★ CLEAR ★</div>
+
+    <button id="undo-btn" class="btn undo" onclick="if(confirm('現在の問題の正解を取り消しますか？')) socket.emit('undo_judge')">↩ 判定取消 (-1点)</button>
+    <button class="btn" style="background:#aaa; margin-top:30px;" onclick="if(confirm('最初からやり直しますか？')) socket.emit('reset_game')">🔄 全リセット</button>
+
+    <script>
+        const socket = io();
+        socket.on('init', (data) => updateStaffUI(data));
+        socket.on('update_question', (data) => updateStaffUI(data));
+
+        function updateStaffUI(data) {
+            if(!data || !data.question) return;
+            document.getElementById('q-id').innerText = data.question.image;
+            document.getElementById('answer-text').innerText = data.question.answerText;
+            document.getElementById('nowscore').innerText = data.score;
+
+            if (data.isCleared) {
+                document.getElementById('clear-status').style.display = 'block';
+                document.getElementById('judge-btn').disabled = true;
+                document.getElementById('undo-btn').disabled = false;
+                document.getElementById('undo-btn').style.opacity = "1";
+            } else {
+                document.getElementById('clear-status').style.display = 'none';
+                document.getElementById('judge-btn').disabled = false;
+                document.getElementById('undo-btn').disabled = true;
+                document.getElementById('undo-btn').style.opacity = "0.5";
+            }
+        }
+
+        socket.on('show_success', (data) => {
+            document.getElementById('q-id').innerText = "RESULT SCREEN";
+            document.getElementById('answer-text').innerText = "全問終了！リザルト表示中";
+            document.getElementById('nowscore').innerText = data.score;
+            document.getElementById('clear-status').style.display = 'none';
+            document.getElementById('judge-btn').disabled = true;
+        });
+    </script>
+</body>
+</html>
