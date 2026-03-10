@@ -1,5 +1,12 @@
 [
   {
+    "id": 0,
+    "image": "kv.png",
+    "answerText": "最初の画面",
+    "time": 999
+  }
+  ,
+  {
     "id": 1,
     "image": "q1-1.png",
     "answerText": "握手をする",
@@ -56,7 +63,7 @@
   {
     "id": 10,
     "image": "q2-5.png",
-    "answerText": "答えは「？？？」。\n二人であいこの手を出す。",
+    "answerText": "答えは「恋」。\n二人であいこの手を出す。",
     "time": 60
   },
   {
@@ -117,36 +124,36 @@
     "id": 20,
     "image": "q4-5.png",
     "answerText": "答えは「チーズ」",
-    "time": 60
+    "time": 90
   },
   {
     "id": 21,
     "image": "q5-1.png",
-    "answerText": "答えは「？？？」",
+    "answerText": "答えは「ファイル」\n別解：スマホのファイルアプリでもOK",
     "time": 30
   },
   {
     "id": 22,
     "image": "q5-2.png",
-    "answerText": "答えは「？？？」",
+    "answerText": "答えは「時計」\n壁掛け時計にかざしてたらOK\n別解：スマホでもOK",
     "time": 30
   },
   {
     "id": 23,
     "image": "q5-3.png",
-    "answerText": "答えは「？？？」",
+    "answerText": "答えは「電卓」\n別解：スマホの電卓アプリでもOK",
     "time": 30
   },
   {
     "id": 24,
     "image": "q5-4.png",
-    "answerText": "答えは「？？？」",
+    "answerText": "答えは「メモ」\n別解：スマホのメモアプリでもOK",
     "time": 30
   },
   {
     "id": 25,
     "image": "q5-5.png",
-    "answerText": "答えは「？？？」",
+    "answerText": "答えは「スマホ」",
     "time": 60
   },
   {
@@ -165,7 +172,7 @@
     "id": 28,
     "image": "q6-3.png",
     "answerText": "「キューブを六月一日に積む」\n崩してなければそのまま達成されている",
-    "time": 10
+    "time": 30
   },
   {
     "id": 29,
