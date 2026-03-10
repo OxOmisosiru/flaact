@@ -60,19 +60,52 @@
         </div>
     </div>
 
+    <audio id="sound-warning" src="10countdown.mp3" preload="auto"></audio>
+    <audio id="bgm-main" src="popcandy.mp3" loop preload="auto"></audio>
+
     <script>
         const socket = io();
         let timerId;
+
+        let isBgmPlaying = false;
+        const warningSound = document.getElementById('sound-warning');
+        const mainBgm = document.getElementById('bgm-main');
+
+        function playBgm() {
+            const bgm = document.getElementById('bgm-main');
+            if (!isBgmPlaying) {
+                bgm.volume = 0.1; // 音量は適宜調整（0.0〜1.0）
+                bgm.play().then(() => {
+                    isBgmPlaying = true;
+                }).catch(e => {
+                    console.log("BGM再生失敗（クリックが必要です）:", e);
+                });
+            }
+        }
+
+        function triggerWarning() {
+            warningSound.currentTime = 0;
+            warningSound.play().catch(e => console.error("警告音再生失敗:", e));
+        }
 
         function startTimer(sec) {
             clearInterval(timerId);
             let timeLeft = sec;
             document.getElementById('timer').innerText = timeLeft;
+            
+            if (timeLeft === 10) {
+                triggerWarning();
+            }
+
             timerId = setInterval(() => {
                 timeLeft--;
+                if (timeLeft === 10) {
+                    triggerWarning();
+                }
                 document.getElementById('timer').innerText = (timeLeft < 0) ? 0 : timeLeft;
                 if (timeLeft <= 0) clearInterval(timerId);
             }, 1000);
+            
         }
 
         socket.on('init', (data) => {
@@ -93,6 +126,17 @@
             if(!data || !data.question) return;
 
             var imageurl = data.question.image;
+
+            if (data.question.id == 1) {
+                playBgm();
+            }
+
+            if(data.question.id == '0'){
+                document.getElementById('timer-container').style.display = 'none';
+            }
+            else{
+                document.getElementById('timer-container').style.display = 'inline';
+            }
 
             if(data.question.id == '20'){ // q4-5 だけ日付によって謎変わる
                 var today = new Date();
