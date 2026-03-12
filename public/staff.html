@@ -44,6 +44,13 @@
             document.getElementById('answer-text').innerText = data.question.answerText;
             document.getElementById('nowscore').innerText = data.score;
 
+            if(data.question.id == '0' || data.question.id == '11111' || data.question.id == '22222' || data.question.id == '33333' || data.question.id == '44444' || data.question.id == '55555'){
+                document.getElementById('judge-btn').style.display = 'none';
+            }
+            else{
+                document.getElementById('judge-btn').style.display = 'block';
+            }
+
             if (data.isCleared) {
                 document.getElementById('clear-status').style.display = 'block';
                 document.getElementById('judge-btn').disabled = true;
