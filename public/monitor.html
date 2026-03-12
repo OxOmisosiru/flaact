@@ -74,7 +74,7 @@
         function playBgm() {
             const bgm = document.getElementById('bgm-main');
             if (!isBgmPlaying) {
-                bgm.volume = 0.1; // 音量は適宜調整（0.0〜1.0）
+                bgm.volume = 0.2; // 音量は適宜調整（0.0〜1.0）
                 bgm.play().then(() => {
                     isBgmPlaying = true;
                 }).catch(e => {
@@ -85,10 +85,19 @@
 
         function triggerWarning() {
             warningSound.currentTime = 0;
+            warningSound.volume = 1;
             warningSound.play().catch(e => console.error("警告音再生失敗:", e));
         }
 
+        function stopWarningSound() {
+            warningSound.pause();
+            warningSound.currentTime = 0;
+        }
+
         function startTimer(sec) {
+            // 新しくタイマーが始まるとき毎回カウントダウン止める
+            stopWarningSound();
+
             clearInterval(timerId);
             let timeLeft = sec;
             document.getElementById('timer').innerText = timeLeft;
@@ -131,7 +140,7 @@
                 playBgm();
             }
 
-            if(data.question.id == '0'){
+            if(data.question.id == '0' || data.question.id == '11111' || data.question.id == '22222' || data.question.id == '33333' || data.question.id == '44444' || data.question.id == '55555'){
                 document.getElementById('timer-container').style.display = 'none';
             }
             else{
@@ -172,7 +181,7 @@
             } else {
                 perfectImg.style.display = 'none';
                 successImg.style.opacity = '1';
-                finalScore.innerText = total;
+                finalScore.innerText = total-1;
                 finalScore.style.display = 'block';
             }
             clearInterval(timerId);
