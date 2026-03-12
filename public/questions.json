@@ -9,7 +9,7 @@
   {
     "id": 1,
     "image": "q1-1.png",
-    "answerText": "握手をする",
+    "answerText": "挨拶をする",
     "time": 30
   },
   {
@@ -223,3 +223,4 @@
     "time": 180
   }
 ]
+
